@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Venta de Pasajes{% endblock %}
+
+{% block content %}
+<h2 class="text-center">Gestión de Pasajes</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Vuelo</th>
+            <th>Destino</th>
+            <th>Asientos Disponibles</th>
+            <th>Acción</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for vuelo in vuelos %}
+            <tr>
+                <td>{{ vuelo.id }}</td>
+                <td>{{ vuelo.ciudad_destino }}</td>
+                <td>{{ vuelo.avion.cantidad_asientos }}</td>
+                <td><a href="{% url 'vender_pasaje' vuelo.id %}" class="btn btn-success">Vender</a></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

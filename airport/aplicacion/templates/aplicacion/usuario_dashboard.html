@@ -1,0 +1,38 @@
+{% extends 'aplicacion/base.html' %}
+
+{% block title %}Vuelos Disponibles{% endblock %}
+
+{% block content %}
+<h2 class="text-center">Consulta de Vuelos</h2>
+
+<form method="GET" class="d-flex justify-content-center my-4">
+    <select name="terminal" class="form-select w-25 mx-2">
+        {% for terminal in terminales %}
+            <option value="{{ terminal.id }}">{{ terminal.nombre }}</option>
+        {% endfor %}
+    </select>
+    <input type="date" name="fecha" class="form-control w-25 mx-2">
+    <button type="submit" class="btn btn-primary">Buscar</button>
+</form>
+
+{% if vuelos %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Vuelo</th>
+                <th>Destino</th>
+                <th>Fecha de Salida</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for vuelo in vuelos %}
+                <tr>
+                    <td>{{ vuelo.id }}</td>
+                    <td>{{ vuelo.ciudad_destino }} ({{ vuelo.pais_destino }})</td>
+                    <td>{{ vuelo.fecha_salida }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+{% endblock %}

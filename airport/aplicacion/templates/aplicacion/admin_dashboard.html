@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Administración de Vuelos{% endblock %}
+
+{% block content %}
+<h2 class="text-center">Administrar Vuelos</h2>
+
+<a href="{% url 'agregar_vuelo' %}" class="btn btn-primary my-3">Agregar Nuevo Vuelo</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Vuelo</th>
+            <th>Destino</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for vuelo in vuelos %}
+            <tr>
+                <td>{{ vuelo.id }}</td>
+                <td>{{ vuelo.ciudad_destino }}</td>
+                <td>
+                    <a href="{% url 'editar_vuelo' vuelo.id %}" class="btn btn-warning">Editar</a>
+                    <a href="{% url 'eliminar_vuelo' vuelo.id %}" class="btn btn-danger">Eliminar</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
