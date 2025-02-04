@@ -13,3 +13,4 @@ class AeropuertoConfig(AppConfig):
 
     def ready(self):
         import app_aeropuerto.signals  # Importa las señales al iniciar la app
+        

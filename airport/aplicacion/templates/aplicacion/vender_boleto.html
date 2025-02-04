@@ -1,0 +1,25 @@
+{% extends 'aplicacion/base.html' %}
+
+{% block title %}Vender Boleto{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center">Venta de Boleto</h2>
+
+    <p><strong>Vuelo:</strong> {{ vuelo.id }} - {{ vuelo.ciudad_destino }} ({{ vuelo.pais_destino }})</p>
+    <p><strong>Fecha de salida:</strong> {{ vuelo.fecha_salida }}</p>
+    <p><strong>Asientos disponibles:</strong> {{ asientos_disponibles }}</p>
+
+    {% if asientos_disponibles > 0 %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Confirmar Venta</button>
+        </form>
+    {% else %}
+        <div class="alert alert-danger">No hay asientos disponibles.</div>
+    {% endif %}
+
+    <a href="{% url 'vista_moderador' %}" class="btn btn-secondary mt-3">Volver</a>
+</div>
+{% endblock %}

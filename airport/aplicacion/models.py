@@ -35,7 +35,7 @@ class Avion(models.Model):
     fabricante = models.CharField(max_length=50)
     pais_fabricante = models.CharField(max_length=50)
     cantidad_asientos = models.IntegerField()
-
+    
     def __str__(self):
         return f"{self.modelo} - {self.matricula}"
 

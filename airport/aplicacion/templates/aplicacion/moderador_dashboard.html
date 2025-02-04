@@ -1,15 +1,16 @@
-{% extends 'base.html' %}
+{% extends 'aplicacion/base.html' %}
 
-{% block title %}Venta de Pasajes{% endblock %}
+{% block title %}Gestión de Pasajes{% endblock %}
 
 {% block content %}
-<h2 class="text-center">Gestión de Pasajes</h2>
+<h2 class="text-center">Lista de Vuelos</h2>
 
 <table class="table table-striped">
     <thead>
         <tr>
             <th>Vuelo</th>
             <th>Destino</th>
+            <th>Fecha de Salida</th>
             <th>Asientos Disponibles</th>
             <th>Acción</th>
         </tr>
@@ -18,9 +19,16 @@
         {% for vuelo in vuelos %}
             <tr>
                 <td>{{ vuelo.id }}</td>
-                <td>{{ vuelo.ciudad_destino }}</td>
-                <td>{{ vuelo.avion.cantidad_asientos }}</td>
-                <td><a href="{% url 'vender_pasaje' vuelo.id %}" class="btn btn-success">Vender</a></td>
+                <td>{{ vuelo.ciudad_destino }} ({{ vuelo.pais_destino }})</td>
+                <td>{{ vuelo.fecha_salida }}</td>
+                <td>{{ vuelo.asientos_disponibles }}</td>
+                <td>
+                    {% if vuelo.asientos_disponibles > 0 %}
+                        <a href="{% url 'vender_boleto' vuelo.id %}" class="btn btn-success">Vender Boleto</a>
+                    {% else %}
+                        <button class="btn btn-secondary" disabled>Lleno</button>
+                    {% endif %}
+                </td>
             </tr>
         {% endfor %}
     </tbody>
