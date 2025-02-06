@@ -1,216 +1,25 @@
-:root {
-    --bg-color: #e0f7ff;
-    --text-color: #005a82;
-    --accent-color: #00a3cc;
-    --glass-bg: rgba(255, 255, 255, 0.25);
-    --glass-border: rgba(255, 255, 255, 0.18);
-    --glass-shadow: rgba(0, 163, 204, 0.1);
-}
-
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: Arial, sans-serif;
     display: grid;
     min-height: 100vh;
     grid-template-rows: auto 1fr auto;
-    background: linear-gradient(135deg, #b3e0ff, #80d8ff);
-    color: var(--text-color);
-    margin: 0;
-    padding: 0;
 }
-
-.navbar {
-    background: var(--glass-bg);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--glass-border);
-    box-shadow: 0 4px 30px var(--glass-shadow);
-}
-
 .navbar-brand {
     font-weight: bold;
-    color: var(--text-color);
 }
-
-.nav-link {
-    color: var(--text-color);
-    transition: color 0.3s ease;
-}
-
-.nav-link:hover {
-    color: var(--accent-color);
-}
-
 .container {
     max-width: 900px;
 }
-
-.content-container {
-    background: var(--glass-bg);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 20px;
-    border: 1px solid var(--glass-border);
-    box-shadow: 0 8px 32px 0 var(--glass-shadow);
-}
-
+/* Estilo normal del enlace */
 .link-detalles {
-    color: var(--text-color);
-    text-decoration: none;
-    font-family: inherit;
-    transition: color 0.3s ease-in-out;
-    position: relative;
+    color: black;  /* Color negro */
+    text-decoration: none;  /* Sin subrayado */
+    font-family: inherit;  /* Usa la fuente del contenido */
+    transition: color 0.3s ease-in-out;  /* Transición suave */
 }
 
-.link-detalles::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 2px;
-    bottom: -2px;
-    left: 0;
-    background-color: var(--accent-color);
-    transform: scaleX(0);
-    transition: transform 0.3s ease-in-out;
-}
-
+/* Cuando el mouse pasa sobre el enlace */
 .link-detalles:hover {
-    color: var(--accent-color);
-}
-
-.link-detalles:hover::after {
-    transform: scaleX(1);
-}
-
-footer {
-    background: var(--glass-bg);
-    backdrop-filter: blur(10px);
-    color: var(--text-color);
-    border-top: 1px solid var(--glass-border);
-    box-shadow: 0 -4px 30px var(--glass-shadow);
-}
-
-/* Glassmorphic form styles */
-input[type="text"],
-input[type="password"],
-input[type="email"],
-textarea,
-select {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 10px;
-    padding: 10px 15px;
-    color: var(--text-color);
-    backdrop-filter: blur(5px);
-    transition: all 0.3s ease;
-}
-
-input[type="text"]:focus,
-input[type="password"]:focus,
-input[type="email"]:focus,
-textarea:focus,
-select:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px var(--accent-color);
-}
-
-button, .btn {
-    border: 1px solid var(--glass-border);
-    border-radius: 10px;
-    padding: 10px 20px;
-    background: var(--glass-bg);
-    color: var(--text-color);
-    backdrop-filter: blur(5px);
-    transition: all 0.3s ease;
-}
-
-button:hover, .btn:hover {
-    background: rgba(255, 255, 255, 0.4);
-    color: var(--accent-color);
-}
-
-button:active, .btn:active {
-    background: rgba(255, 255, 255, 0.6);
-}
-
-/* Add or update these styles in your CSS file */
-
-.card {
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-}
-
-.form-select, .form-control {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: var(--text-color);
-}
-
-.form-select:focus, .form-control:focus {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 0.25rem rgba(0, 163, 204, 0.25);
-}
-
-.btn-primary {
-    background-color: var(--accent-color);
-    border-color: var(--accent-color);
-}
-
-.btn-primary:hover {
-    background-color: #0082a3;
-    border-color: #0082a3;
-}
-
-.btn-outline-secondary {
-    border-color: rgba(255, 255, 255, 0.5);
-    color: var(--text-color);
-}
-
-.btn-outline-secondary:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: var(--accent-color);
-}
-
-.badge {
-    backdrop-filter: blur(5px);
-}
-
-
-/* Additional glassmorphic elements */
-.card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
-    border: 1px solid var(--glass-border);
-    box-shadow: 0 8px 32px 0 var(--glass-shadow);
-}
-
-.table {
-    background: var(--glass-bg);
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
-    overflow: hidden;
-}
-
-.table th, .table td {
-    border-color: var(--glass-border);
-}
-
-/* Custom scrollbar for webkit browsers */
-::-webkit-scrollbar {
-    width: 10px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--glass-bg);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--accent-color);
-    border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--text-color);
+    color: #007bff;  /* Azul Bootstrap */
+    text-decoration: underline;  /* Opcional: subrayado en hover */
 }
