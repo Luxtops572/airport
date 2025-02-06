@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import vista_usuario, vista_moderador,detalles_vuelo, vista_admin,index,vender_boleto,detalles_vuelo_pagina
 from django.contrib.auth.views import LoginView, LogoutView
+from . import views
 
 urlpatterns = [
     path("", index,name = "index"),
@@ -11,5 +12,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='vuelos'), name='logout'),  # Redirige a login tras cerrar sesión
     path('moderador/vender/<int:vuelo_id>/', vender_boleto, name='vender_boleto'),
     path('vuelo/detalles/pagina/<int:vuelo_id>/', detalles_vuelo_pagina, name='detalles_vuelo_pagina'),
+    path('vender_boleto/<int:vuelo_id>/', views.vender_boleto, name='vender_boleto'),
+    path('confirmacion_venta/', views.confirmacion_venta, name='confirmacion_venta'),
+    path('obtener_asientos_disponibles/<str:clase>/', views.obtener_asientos_disponibles, name='obtener_asientos_disponibles'),
 ]
-

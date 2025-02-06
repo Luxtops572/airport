@@ -4,7 +4,8 @@ from django.http import HttpResponse
 
 # Create your views here.
 def index(request):
-    return HttpResponse("Proof");
+    return HttpResponse("Proof")
+
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
@@ -12,29 +13,40 @@ from .models import Vuelo, Terminal
 
 from datetime import datetime
 
+
 def vista_usuario(request):
     terminales = Terminal.objects.all()
-    vuelos = None  
+    vuelos = None
 
     terminal_id = request.GET.get("terminal")
     fecha_str = request.GET.get("fecha")  # La fecha viene como string
 
     if terminal_id and fecha_str:
         try:
-            fecha_obj = datetime.strptime(fecha_str, "%Y-%m-%d").date()  # Convertir string a date
+            fecha_obj = datetime.strptime(
+                fecha_str, "%Y-%m-%d"
+            ).date()  # Convertir string a date
             vuelos = Vuelo.objects.filter(
                 terminal_id=terminal_id,
-                fecha_salida__date=fecha_obj  # Ignorar la hora en la comparación
+                fecha_salida__date=fecha_obj,  # Ignorar la hora en la comparación
             )
         except ValueError:
             vuelos = []  # Si la fecha es inválida, retorna lista vacía
 
-    return render(request, "aplicacion/usuario_dashboard.html", {"terminales": terminales, "vuelos": vuelos})
+    return render(
+        request,
+        "aplicacion/usuario_dashboard.html",
+        {"terminales": terminales, "vuelos": vuelos},
+    )
+
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 
+
 def es_moderador(user):
     return user.groups.filter(name="Moderador").exists()
+
+
 """
 @login_required
 @user_passes_test(es_moderador)
@@ -42,48 +54,71 @@ def es_moderador(user):
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Vuelo, Boleto
 
+
 def vista_moderador(request):
     vuelos = Vuelo.objects.all()
-    
+
     # Agregar información de asientos disponibles
     for vuelo in vuelos:
         boletos_vendidos = Boleto.objects.filter(vuelo=vuelo).count()
-        vuelo.asientos_disponibles = vuelo.avion.cantidad_asientos - boletos_vendidos  # Nueva propiedad dinámica
+        vuelo.asientos_disponibles = (
+            vuelo.avion.cantidad_asientos - boletos_vendidos
+        )  # Nueva propiedad dinámica
 
     return render(request, "aplicacion/moderador_dashboard.html", {"vuelos": vuelos})
 
+
 def es_administrador(user):
     return user.groups.filter(name="Administrador").exists()
+
+
 """
 @login_required
 @user_passes_test(es_administrador)
 """
+
+
 def vista_admin(request):
     return render(request, "aplicacion/admin_dashboard.html")
 
 
 from django import forms
 
-class VentaBoletoForm(forms.Form):
-    CLASE_ASIENTO_CHOICES = [
-        ('PRIMERA', 'Primera Clase'),
-        ('SEGUNDA', 'Segunda Clase'),
-        ('TERCERA', 'Tercera Clase'),
-    ]
-    nombre = forms.CharField(max_length=50)
-    apellidos = forms.CharField(max_length=50)
-    clase_asiento = forms.ChoiceField(choices=CLASE_ASIENTO_CHOICES)
+from django import forms
+from .models import Boleto
 
 
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import JsonResponse
+from .models import Vuelo, Boleto, Pasajero
+from .forms import VentaBoletoForm
 
-def obtener_asiento_disponible(vuelo, clase):
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from .models import Vuelo, Boleto
+
+def obtener_asientos_disponibles(request):
+    vuelo_id = request.GET.get("vuelo_id")
+    clase = request.GET.get("clase")
+
+    vuelo = get_object_or_404(Vuelo, id=vuelo_id)
+    asientos_ocupados = set(Boleto.objects.filter(vuelo=vuelo).values_list("numero_asiento", flat=True))
+
+    # Obtener rangos de asientos según la clase
     rangos = vuelo.obtener_rangos_asientos()
-    asientos_ocupados = Boleto.objects.filter(vuelo=vuelo, clase_asiento=clase).values_list("numero_asiento", flat=True)
+    
+    # Filtrar solo los asientos disponibles en la clase seleccionada
+    asientos_disponibles = [asiento for asiento in rangos[clase] if asiento not in asientos_ocupados]
 
-    for asiento in rangos[clase]:
-        if asiento not in asientos_ocupados:
-            return asiento
-    return None  # Si no hay asientos disponibles
+    return JsonResponse({"asientos": asientos_disponibles})
+
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Vuelo, Boleto, Pasajero
+from .forms import VentaBoletoForm
+
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Vuelo, Boleto, Pasajero
+from .forms import VentaBoletoForm
 
 def vender_boleto(request, vuelo_id):
     vuelo = get_object_or_404(Vuelo, id=vuelo_id)
@@ -92,33 +127,49 @@ def vender_boleto(request, vuelo_id):
         form = VentaBoletoForm(request.POST)
         if form.is_valid():
             clase_asiento = form.cleaned_data["clase_asiento"]
-            numero_asiento = obtener_asiento_disponible(vuelo, clase_asiento)
+            numero_asiento = int(form.cleaned_data["numero_asiento"])
 
-            if numero_asiento is None:
-                return render(request, "aplicacion/vender_boleto.html", {"form": form, "vuelo": vuelo, "error": "No hay asientos disponibles en esta clase."})
+            # Validar que el asiento seleccionado está disponible
+            asientos_disponibles = obtener_asientos_disponibles_directo(vuelo, clase_asiento)
+            if numero_asiento not in asientos_disponibles:
+                return render(request, "aplicacion/vender_boleto.html", {
+                    "form": form, 
+                    "vuelo": vuelo, 
+                    "error": "El asiento seleccionado ya está ocupado. Intente con otro."
+                })
 
+            # Crear o buscar el pasajero
             pasajero, _ = Pasajero.objects.get_or_create(
                 nombre=form.cleaned_data["nombre"],
                 apellidos=form.cleaned_data["apellidos"]
             )
 
+            # Crear el boleto
             Boleto.objects.create(
                 vuelo=vuelo,
-                pasajero=pasajero,
+                pasajero=pasajero,  
                 clase_asiento=clase_asiento,
                 numero_asiento=numero_asiento
             )
 
             return redirect("vista_moderador")
+
     else:
         form = VentaBoletoForm()
 
-    return render(request, "aplicacion/vender_boleto.html", {"form": form, "vuelo": vuelo})
+    return render(request, "aplicacion/vender_boleto.html", {
+        "form": form, 
+        "vuelo": vuelo
+    })
 
+def obtener_asientos_disponibles_directo(vuelo, clase):
+    """ Función auxiliar para obtener asientos disponibles directamente sin JSON """
+    asientos_ocupados = set(Boleto.objects.filter(vuelo=vuelo).values_list("numero_asiento", flat=True))
+    rangos = vuelo.obtener_rangos_asientos()
+    return [asiento for asiento in rangos[clase] if asiento not in asientos_ocupados]
 
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from .models import Vuelo, Boleto
+def confirmacion_venta(request):
+    return render(request, 'confirmacion_venta.html')
 
 def detalles_vuelo(request, vuelo_id):
     vuelo = get_object_or_404(Vuelo, id=vuelo_id)
@@ -136,20 +187,22 @@ def detalles_vuelo(request, vuelo_id):
         "asientos_disponibles": asientos_disponibles,
         "boletos_vendidos": boletos_vendidos,
     }
-    
+
     return JsonResponse(data)
 
-
-from django.shortcuts import render, get_object_or_404
-from .models import Vuelo, Boleto
 
 def detalles_vuelo_pagina(request, vuelo_id):
     vuelo = get_object_or_404(Vuelo, id=vuelo_id)
     boletos_vendidos = Boleto.objects.filter(vuelo=vuelo).count()
     asientos_disponibles = vuelo.avion.cantidad_asientos - boletos_vendidos
 
-    return render(request, "aplicacion/detalles_vuelo.html", {
-        "vuelo": vuelo,
-        "boletos_vendidos": boletos_vendidos,
-        "asientos_disponibles": asientos_disponibles
-    })
+    return render(
+        request,
+        "aplicacion/detalles_vuelo.html",
+        {
+            "vuelo": vuelo,
+            "boletos_vendidos": boletos_vendidos,
+            "asientos_disponibles": asientos_disponibles,
+        },
+    )
+
