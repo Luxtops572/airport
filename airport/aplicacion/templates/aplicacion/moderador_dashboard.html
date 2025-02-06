@@ -8,7 +8,6 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>Vuelo</th>
             <th>Destino</th>
             <th>Fecha de Salida</th>
             <th>Asientos Disponibles</th>
@@ -18,8 +17,7 @@
     <tbody>
         {% for vuelo in vuelos %}
             <tr>
-                <td>{{ vuelo.id }}</td>
-                <td>{{ vuelo.ciudad_destino }} ({{ vuelo.pais_destino }})</td>
+                <td><a href="{% url 'detalles_vuelo_pagina' vuelo.id %}" class="link-detalles">{{ vuelo.ciudad_destino }} ({{ vuelo.pais_destino }})</a></td>
                 <td>{{ vuelo.fecha_salida }}</td>
                 <td>{{ vuelo.asientos_disponibles }}</td>
                 <td>
@@ -33,4 +31,26 @@
         {% endfor %}
     </tbody>
 </table>
+
+<!-- Modal para ver detalles del vuelo -->
+<div id="modalVuelo" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalles del Vuelo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Terminal:</strong> <span id="det-terminal"></span></p>
+                <p><strong>Destino:</strong> <span id="det-ciudad"></span>, <span id="det-pais"></span></p>
+                <p><strong>Fecha de Salida:</strong> <span id="det-fecha-salida"></span></p>
+                <p><strong>Fecha de Arribo:</strong> <span id="det-fecha-arribo"></span></p>
+                <p><strong>Tipo de Vuelo:</strong> <span id="det-tipo"></span></p>
+                <p><strong>Asientos Disponibles:</strong> <span id="det-asientos"></span></p>
+                <p><strong>Boletos Vendidos:</strong> <span id="det-boletos"></span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

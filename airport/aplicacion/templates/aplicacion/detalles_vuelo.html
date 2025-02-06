@@ -1,0 +1,30 @@
+{% extends 'aplicacion/base.html' %}
+
+{% block title %}Detalles del Vuelo{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center mb-4">Detalles del Vuelo</h2>
+
+    <div class="card shadow p-4">
+        <h4 class="text-primary">Vuelo ID: {{ vuelo.id }}</h4>
+        <hr>
+
+        <p><strong>Terminal:</strong> {{ vuelo.terminal.nombre }}</p>
+        <p><strong>Destino:</strong> {{ vuelo.ciudad_destino }}, {{ vuelo.pais_destino }}</p>
+        <p><strong>Fecha de Salida:</strong> {{ vuelo.fecha_salida }}</p>
+        <p><strong>Fecha de Arribo:</strong> {{ vuelo.fecha_arribo }}</p>
+        <p><strong>Tipo de Vuelo:</strong> {{ vuelo.get_tipo_vuelo_display }}</p>
+
+        <hr>
+
+        <h5 class="text-success">Disponibilidad de Asientos</h5>
+        <p><strong>Asientos Disponibles:</strong> {{ asientos_disponibles }}</p>
+        <p><strong>Boletos Vendidos:</strong> {{ boletos_vendidos }}</p>
+
+        <hr>
+
+        <a href="{% url 'vista_usuario' %}" class="btn btn-secondary">Volver</a>
+    </div>
+</div>
+{% endblock %}

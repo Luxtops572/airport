@@ -1,0 +1,25 @@
+body {
+    font-family: Arial, sans-serif;
+    display: grid;
+    min-height: 100vh;
+    grid-template-rows: auto 1fr auto;
+}
+.navbar-brand {
+    font-weight: bold;
+}
+.container {
+    max-width: 900px;
+}
+/* Estilo normal del enlace */
+.link-detalles {
+    color: black;  /* Color negro */
+    text-decoration: none;  /* Sin subrayado */
+    font-family: inherit;  /* Usa la fuente del contenido */
+    transition: color 0.3s ease-in-out;  /* Transición suave */
+}
+
+/* Cuando el mouse pasa sobre el enlace */
+.link-detalles:hover {
+    color: #007bff;  /* Azul Bootstrap */
+    text-decoration: underline;  /* Opcional: subrayado en hover */
+}
