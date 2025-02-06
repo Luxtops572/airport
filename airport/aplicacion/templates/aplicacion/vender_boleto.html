@@ -40,7 +40,6 @@
                 <div class="col-md-6">
                     <label for="id_clase_asiento" class="form-label">Clase de Asiento</label>
                     <select class="form-select" id="clase_asiento" name="clase_asiento">
-                        <option value="">Seleccione una clase</option>
                         <option value="PRIMERA">Primera Clase</option>
                         <option value="SEGUNDA">Segunda Clase</option>
                         <option value="TERCERA">Tercera Clase</option>
@@ -50,7 +49,9 @@
                 <div class="col-md-6">
                     <label for="id_asiento" class="form-label">Número de Asiento</label>
                     <select class="form-select" id="asiento_select" name="numero_asiento">
-                        <option value="">Seleccione un asiento</option>
+                        {% for asiento in asientos %}
+                            <option value="{{ asiento }}">{{ asiento }}</option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
@@ -63,40 +64,4 @@
     </div>
 </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const claseSelect = document.getElementById("clase_asiento");
-    const asientoSelect = document.getElementById("asiento_select");
-
-    // Detectar cambio de clase y cargar asientos disponibles
-    claseSelect.addEventListener("change", function () {
-        const claseSeleccionada = this.value;
-        asientoSelect.innerHTML = '<option value="">Cargando asientos...</option>';
-
-        if (claseSeleccionada) {
-            fetch(`/asientos-disponibles/?vuelo_id={{ vuelo.id }}&clase=${claseSeleccionada}`)
-                .then(response => response.json())
-                .then(data => {
-                    asientoSelect.innerHTML = '<option value="">Seleccione un asiento</option>';
-                    data.asientos.forEach(asiento => {
-                        const option = document.createElement("option");
-                        option.value = asiento;
-                        option.textContent = `Asiento ${asiento}`;
-                        asientoSelect.appendChild(option);
-                    });
-                });
-        } else {
-            asientoSelect.innerHTML = '<option value="">Seleccione una clase primero</option>';
-        }
-    });
-
-    // Validar que los campos estén completos antes de enviar
-    document.getElementById("ventaForm").addEventListener("submit", function (event) {
-        if (!claseSelect.value || !asientoSelect.value) {
-            event.preventDefault();
-            alert("Debe seleccionar una clase de asiento y un número de asiento.");
-        }
-    });
-});
-</script>
 {% endblock %}
