@@ -3,36 +3,116 @@
 {% block title %}Vender Boleto{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2 class="text-center">Venta de Boleto</h2>
+<div class="card mb-4">
+    <div class="card-body">
+        <h2 class="card-title text-center mb-4">Venta de Boleto</h2>
 
-    <p><strong>Vuelo:</strong> {{ vuelo.id }} - {{ vuelo.ciudad_destino }}</p>
-    <p><strong>Fecha de salida:</strong> {{ vuelo.fecha_salida }}</p>
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <p><strong>Vuelo:</strong> {{ vuelo.id }} - {{ vuelo.ciudad_destino }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Fecha de salida:</strong> {{ vuelo.fecha_salida|date:"d/m/Y H:i" }}</p>
+            </div>
+        </div>
 
-    {% if error %}
-        <div class="alert alert-danger">{{ error }}</div>
-    {% endif %}
+        {% if error %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% endif %}
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-
-        <h5>Asientos disponibles:</h5>
-        <ul>
-            {% for clase, rango in vuelo.obtener_rangos_asientos.items %}
-                <li><strong>{{ clase }}</strong>: 
-                    {% for asiento in rango %}
-                        {% if asiento not in asientos_ocupados %}
-                            {{ asiento }}
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row mb-4">
+                {% for field in form %}
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ field.errors|join:", " }}
+                            </div>
                         {% endif %}
-                    {% endfor %}
-                </li>
-            {% endfor %}
-        </ul>
+                    </div>
+                {% endfor %}
+            </div>
 
-        <button type="submit" class="btn btn-primary">Confirmar Venta</button>
-    </form>
+            <h5 class="mb-3">Selección de asiento:</h5>
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3">
+                    <label for="clase_asiento" class="form-label">Clase de asiento</label>
+                    <select class="form-select" id="clase_asiento" name="clase_asiento">
+                        <option value="">Seleccione una clase</option>
+                        {% for clase, rango in vuelo.obtener_rangos_asientos.items %}
+                            <option value="{{ clase|lower }}">{{ clase }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                {% for clase, rango in vuelo.obtener_rangos_asientos.items %}
+                    <div class="col-md-6 mb-3 asiento-select" id="asiento_{{ clase|lower }}_container" style="display: none;">
+                        <label for="asiento_{{ clase|lower }}" class="form-label">Asiento de {{ clase }}</label>
+                        <div class="d-flex align-items-center">
+                            <select class="form-select me-2" name="asiento_{{ clase|lower }}" id="asiento_{{ clase|lower }}">
+                                <option value="">Seleccione un asiento</option>
+                                {% for asiento in rango %}
+                                    {% if asiento not in asientos_ocupados %}
+                                        <option value="{{ asiento }}">{{ asiento }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                            <span class="badge bg-info rounded-pill">
+                                {{ rango.0 }} - {{ rango|last }}
+                            </span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
 
-    <a href="{% url 'vista_moderador' %}" class="btn btn-secondary mt-3">Volver</a>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg">Confirmar Venta</button>
+                <a href="{% url 'vista_moderador' %}" class="btn btn-outline-secondary">Volver</a>
+            </div>
+        </form>
+    </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const claseSelect = document.getElementById('clase_asiento');
+    const asientoContainers = document.querySelectorAll('.asiento-select');
+
+    claseSelect.addEventListener('change', function() {
+        asientoContainers.forEach(container => {
+            container.style.display = 'none';
+        });
+        const selectedClase = this.value;
+        if (selectedClase) {
+            const selectedContainer = document.getElementById(`asiento_${selectedClase}_container`);
+            if (selectedContainer) {
+                selectedContainer.style.display = 'block';
+            }
+        }
+    });
+
+    form.addEventListener('submit', function(event) {
+        const selectedClase = claseSelect.value;
+        if (!selectedClase) {
+            event.preventDefault();
+            alert('Por favor, seleccione una clase de asiento.');
+            return;
+        }
+
+        const asientoSelect = document.getElementById(`asiento_${selectedClase}`);
+        if (!asientoSelect.value) {
+            event.preventDefault();
+            alert('Por favor, seleccione un asiento antes de confirmar la venta.');
+        }
+    });
+});
+</script>
 {% endblock %}
+
