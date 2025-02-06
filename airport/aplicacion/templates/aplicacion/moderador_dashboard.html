@@ -3,54 +3,136 @@
 {% block title %}Gestión de Pasajes{% endblock %}
 
 {% block content %}
-<h2 class="text-center">Lista de Vuelos</h2>
-
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Destino</th>
-            <th>Fecha de Salida</th>
-            <th>Asientos Disponibles</th>
-            <th>Acción</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for vuelo in vuelos %}
-            <tr>
-                <td><a href="{% url 'detalles_vuelo_pagina' vuelo.id %}" class="link-detalles">{{ vuelo.ciudad_destino }} ({{ vuelo.pais_destino }})</a></td>
-                <td>{{ vuelo.fecha_salida }}</td>
-                <td>{{ vuelo.asientos_disponibles }}</td>
-                <td>
-                    {% if vuelo.asientos_disponibles > 0 %}
-                        <a href="{% url 'vender_boleto' vuelo.id %}" class="btn btn-success">Vender Boleto</a>
-                    {% else %}
-                        <button class="btn btn-secondary" disabled>Lleno</button>
-                    {% endif %}
-                </td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="card mb-4">
+    <div class="card-body">
+        <h2 class="card-title text-center mb-4">Lista de Vuelos</h2>
+        
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Destino</th>
+                        <th>Fecha de Salida</th>
+                        <th>Asientos Disponibles</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vuelo in vuelos %}
+                        <tr>
+                            <td>
+                                <a href="#" class="link-detalles" data-bs-toggle="modal" data-bs-target="#modalVuelo" 
+                                   data-id="{{ vuelo.id }}" 
+                                   data-terminal="{{ vuelo.terminal }}"
+                                   data-ciudad="{{ vuelo.ciudad_destino }}"
+                                   data-pais="{{ vuelo.pais_destino }}"
+                                   data-salida="{{ vuelo.fecha_salida|date:"d/m/Y H:i" }}"
+                                   data-arribo="{{ vuelo.fecha_arribo|date:"d/m/Y H:i" }}"
+                                   data-tipo="{{ vuelo.tipo_vuelo }}"
+                                   data-asientos="{{ vuelo.asientos_disponibles }}"
+                                   data-boletos="{{ vuelo.boletos_vendidos }}">
+                                    {{ vuelo.ciudad_destino }} ({{ vuelo.pais_destino }})
+                                </a>
+                            </td>
+                            <td>{{ vuelo.fecha_salida|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <span class="badge bg-{{ vuelo.asientos_disponibles|yesno:"success,danger" }} rounded-pill">
+                                    {{ vuelo.asientos_disponibles }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if vuelo.asientos_disponibles > 0 %}
+                                    <a href="{% url 'vender_boleto' vuelo.id %}" class="btn btn-outline-primary btn-sm">Vender Boleto</a>
+                                {% else %}
+                                    <button class="btn btn-outline-secondary btn-sm" disabled>Lleno</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center">No hay vuelos disponibles en este momento.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 <!-- Modal para ver detalles del vuelo -->
 <div id="modalVuelo" class="modal fade" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Detalles del Vuelo</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p><strong>Terminal:</strong> <span id="det-terminal"></span></p>
-                <p><strong>Destino:</strong> <span id="det-ciudad"></span>, <span id="det-pais"></span></p>
-                <p><strong>Fecha de Salida:</strong> <span id="det-fecha-salida"></span></p>
-                <p><strong>Fecha de Arribo:</strong> <span id="det-fecha-arribo"></span></p>
-                <p><strong>Tipo de Vuelo:</strong> <span id="det-tipo"></span></p>
-                <p><strong>Asientos Disponibles:</strong> <span id="det-asientos"></span></p>
-                <p><strong>Boletos Vendidos:</strong> <span id="det-boletos"></span></p>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <strong>Terminal:</strong> <span id="det-terminal"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Destino:</strong> <span id="det-ciudad"></span>, <span id="det-pais"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Fecha de Salida:</strong> <span id="det-fecha-salida"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Fecha de Arribo:</strong> <span id="det-fecha-arribo"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Tipo de Vuelo:</strong> <span id="det-tipo"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Asientos Disponibles:</strong> <span id="det-asientos"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Boletos Vendidos:</strong> <span id="det-boletos"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <a href="#" id="btn-vender-modal" class="btn btn-primary">Vender Boleto</a>
             </div>
         </div>
     </div>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('modalVuelo');
+    modal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const id = button.getAttribute('data-id');
+        const terminal = button.getAttribute('data-terminal');
+        const ciudad = button.getAttribute('data-ciudad');
+        const pais = button.getAttribute('data-pais');
+        const salida = button.getAttribute('data-salida');
+        const arribo = button.getAttribute('data-arribo');
+        const tipo = button.getAttribute('data-tipo');
+        const asientos = button.getAttribute('data-asientos');
+        const boletos = button.getAttribute('data-boletos');
+
+        modal.querySelector('#det-terminal').textContent = terminal;
+        modal.querySelector('#det-ciudad').textContent = ciudad;
+        modal.querySelector('#det-pais').textContent = pais;
+        modal.querySelector('#det-fecha-salida').textContent = salida;
+        modal.querySelector('#det-fecha-arribo').textContent = arribo;
+        modal.querySelector('#det-tipo').textContent = tipo;
+        modal.querySelector('#det-asientos').textContent = asientos;
+        modal.querySelector('#det-boletos').textContent = boletos;
+
+        const btnVender = modal.querySelector('#btn-vender-modal');
+        if (parseInt(asientos) > 0) {
+            btnVender.classList.remove('d-none');
+            btnVender.href = `/vender-boleto/${id}/`;
+        } else {
+            btnVender.classList.add('d-none');
+        }
+    });
+});
+</script>
 {% endblock %}
+
